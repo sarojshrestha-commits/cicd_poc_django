@@ -6,6 +6,7 @@ Self-contained Django application with Docker and Docker Compose setup.
 
 - Docker Engine + Docker Compose v2
 - Python 3.11+ (for local development without Docker)
+- `uv` (optional, faster than pip): `pip install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`
 
 ## Quick Start
 
@@ -18,6 +19,18 @@ docker compose up
 App runs on `http://localhost:8000`
 
 ### Run Locally (without Docker)
+
+Using `uv`:
+
+```bash
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+
+python manage.py runserver
+```
+
+Or with pip:
 
 ```bash
 python -m venv .venv
