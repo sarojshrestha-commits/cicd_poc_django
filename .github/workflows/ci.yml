@@ -89,7 +89,12 @@ jobs:
       run: echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: Push to GitHub Container Registry
-      run: docker push ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+      run: |
+        docker push ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+        if [ "${{ github.ref_name }}" = "main" ] && [ "${{ github.ref_type }}" = "branch" ]; then
+          docker tag python-app:${{ env.IMAGE_TAG }} ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:latest
+        fi
 
     - name: Run tests in container
       run: docker run --rm python-app:${{ env.IMAGE_TAG }} python manage.py test
