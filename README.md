@@ -80,3 +80,19 @@ SQLite database (`db.sqlite3`) is persisted on host. Delete to reset.
 ## Settings
 
 Edit `config/settings.py` for production deployments (ALLOWED_HOSTS, DEBUG, etc).
+
+## CI/CD
+
+`.github/workflows/ci.yml` runs three chained jobs on a self-hosted runner (see [runner_stack](../runner_stack)): `lint` → `test` → `build` (build only on push, not PRs). The build job pushes images to `ghcr.io/<owner>/<repo>`.
+
+### Required repository secret
+
+| Secret | Where to add | Scopes needed | Why |
+|---|---|---|---|
+| `GHCR_PAT` | Repo → Settings → Secrets and variables → **Actions** (not Codespaces) | `repo`, `write:packages` | Pushes Docker images to GHCR. `GITHUB_TOKEN` doesn't work here — org policy blocks the Actions app installation from creating a *new* package; a personal token authenticates as your account instead and bypasses that restriction. |
+
+Generate at **GitHub → Settings → Developer settings → Personal access tokens (classic)**. Only check `repo` and `write:packages` — nothing else is needed for this workflow.
+
+### Runner requirement
+
+The runner itself must be registered and running (see [runner_stack/README.md](../runner_stack/README.md)) with labels matching `runs-on: [self-hosted, linux, x64]` in the workflow, and must have Docker socket access configured (rootless-socket gotcha documented there too).
